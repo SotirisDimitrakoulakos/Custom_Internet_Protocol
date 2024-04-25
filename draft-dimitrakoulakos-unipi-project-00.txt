@@ -1,0 +1,392 @@
+
+
+
+
+Education                                           S.D. Dimitrakoulakos
+Internet-Draft                                     University of Piraeus
+Intended status: Informational                               25 May 2023
+Expires: 26 November 2023
+
+
+                       Semester project for 2023
+                 draft-dimitrakoulakos-unipi-project-00
+
+Abstract
+
+   The purpose of this document is to provide information on the
+   structure of the calculator protocol, the sequence of its messages
+   and the message fields.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 26 November 2023.
+
+Copyright Notice
+
+   Copyright (c) 2023 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+
+
+
+
+
+Dimitrakoulakos         Expires 26 November 2023                [Page 1]
+
+Internet-Draft          Semester project for 2023               May 2023
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Protocol Overview . . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Protocol Header Format  . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Client header . . . . . . . . . . . . . . . . . . . . . .   4
+     4.2.  Server header . . . . . . . . . . . . . . . . . . . . . .   5
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   6
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   8.  Informative References  . . . . . . . . . . . . . . . . . . .   7
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
+
+1.  Introduction
+
+   The purpose of this document is simple.  To provide the IETF and
+   other interested parties, a clear description on the funcionality,
+   structure and usage of the designed protocol.
+
+   This document follows the keyword use as specified in RFC2119
+   [RFC2119].
+
+   The remainder of this document SHOULD be organized as follows.
+   Section 2 explains the terminology used in this document.  Section 3
+   provides a high-level overview of the protocol.  Finally, Section 4
+   provides the details of each protocol header.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC2119 [RFC2119].
+
+2.  Terminology
+
+   This document uses the following terms:
+
+      Protocol - A pre-approved communication language between two end
+      systems.
+
+      Server - The part of the communication protocol that receives the
+      request.  In this project the server is an endpoint for a
+      database.
+
+      Client - The part of the communication protocol that starts the
+
+
+
+
+Dimitrakoulakos         Expires 26 November 2023                [Page 2]
+
+Internet-Draft          Semester project for 2023               May 2023
+
+
+      request.  In this project the client is a student application that
+      requests subscription to the student's database.
+
+      byte - An 8-bit octet.
+
+      padding - Bits or characters that fill up unused portions of a
+      data structure, such as a field, packet or frame.
+
+      string - A sequence of characters used to represent text.
+
+3.  Protocol Overview
+
+   Figure 1 provides a detailed high-level overview of the message
+   exchange between the server and the client.
+
+    Client                                                       Server
+
+      |                       Request Message                       |
+      |                                                             |
+      | ----------------------------------------------------------> |
+      |                                                             |
+      |                                                             |
+      |                                                             |
+      |                                                             |
+      |                                                             |
+      |                                                             |
+      |                       Response Message                      |
+      |                                                             |
+      | <---------------------------------------------------------  |
+      |                                                             |
+      |                                                             |
+
+                         Figure 1: Message Exchange
+
+   The Client sends a packet to the Server with a Message Type, the
+   Message Length, 4 values and a string code for a Math Operation.  The
+   Server them uses only the needed values for the requested math
+   operation, produces a result (number or error message) and finally
+   composes a packet with a Message Type, the Message Length and the
+   Result of the operation, which he send back to the Client as a
+   response.
+
+4.  Protocol Header Format
+
+   The following headers are required in order to satisfy all the
+   requirements
+
+   Each header SHOULD be in a different subsection
+
+
+
+Dimitrakoulakos         Expires 26 November 2023                [Page 3]
+
+Internet-Draft          Semester project for 2023               May 2023
+
+
+4.1.  Client header
+
+   This is the first message sent by the Client to initiate the
+   communication process...
+
+   The following figure shows the message format.
+
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-------------------------------+-------------------------------+
+     |                               |                               |
+     |                               |                               |
+     |            Type               |            Length             |
+     |                               |                               |
+     +-------------------------------+-------------------------------+
+     |                               |                               |
+     |                               |                               |
+     |           Value1              |            Value2             |
+     |                               |                               |
+     +-------------------------------+-------------------------------+
+     |                               |                               |
+     |                               |                               |
+     |           Value3              |            Value4             |
+     |                               |                               |
+     +-------------------------------+-------------------------------+
+     |                                                               |
+     |                                                               |
+     |                 Math Operation.....|Padding|                  |
+     |                                                               |
+     |                                                               |
+     +---------------------------------------------------------------+
+
+                         Figure 2: A Header Format
+
+   *  Type - 16 bits unsigned integer: The message type.  For this
+      message, the message type MUST be 0.
+
+   *  Length - 16 bits unsigned integer: The value for this field is the
+      length of the message.
+
+   *  Value1 - 16 bits unsigned integer: The value for this field is the
+      first number for the math operation.
+
+   *  Value2 - 16 bits unsigned integer: The value for this field is the
+      second number for the math operation.
+
+
+
+
+
+
+Dimitrakoulakos         Expires 26 November 2023                [Page 4]
+
+Internet-Draft          Semester project for 2023               May 2023
+
+
+   *  Value3 - 16 bits unsigned integer: The value for this field is the
+      third number for the math operation (if it is not needed, it
+      defaults to 0).
+
+   *  Value4 - 16 bits unsigned integer: The value for this field is the
+      fourth number for the math operation (if it is not needed, it
+      defaults to 0).
+
+   *  Math Operation - 32 bits of a string with padding: The value for
+      this field is a string of the symbol, of the desired math
+      operation (with padding to fill up to 32 bits).
+
+   The client will send to the server a packet with the type of the
+   message (0 [request]), the length of the total message, 4 integer
+   values and the code (A, B, C, D, E) in a string (with the necessary
+   padding), which represents the mathematical operation requested to be
+   performed.  In the event that less than 4 Values are needed for the
+   respective operation, then only the needed values will be used (e.g.
+   in the subtraction operation, Value1, Value2), while the rest will be
+   sent with the default value 0, and will simply not be used by the
+   server.  The type and length are unsigned short integers (H), so they
+   are assigned 2 bytes each and constitute the first level of the
+   packet.  Now Value1, Value2, Value3 and Value4 can all take values
+   greater than 255 and definitely less than 65535 (0 to 60000 or
+   30000).  So we are talking about unsigned integers (all positive) and
+   according to the formula: For n byte unsigned integers = 0 to (2n*8/
+   - 1).  It is enough for us to give 2 bytes to each Value and, because
+   these are also unsigned short integers (H), as a result the next two
+   levels are created as above.  Finally, the math operation field, is
+   given the last level of 4 bytes, since it is a string with variable
+   length and whatever is left over between the length of the string and
+   the 32 bit cap, is filled with the corresponding calculated padding.
+
+4.2.  Server header
+
+   This is the second message sent by the Server to finilize the
+   communication process...
+
+   The following figure shows the message format.
+
+
+
+
+
+
+
+
+
+
+
+
+Dimitrakoulakos         Expires 26 November 2023                [Page 5]
+
+Internet-Draft          Semester project for 2023               May 2023
+
+
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-------------------------------+-------------------------------+
+     |                               |                               |
+     |                               |                               |
+     |            Type               |            Length             |
+     |                               |                               |
+     +-------------------------------+-------------------------------+
+     |                                                               |
+     |                                                               |
+     |                     Result.....|Padding|                      |
+     |                                                               |
+     +---------------------------------------------------------------+
+
+                         Figure 3: A Header Format
+
+   *  Type - 16 bits unsigned integer: The message type.  For this
+      message, the message type MUST be 1.
+
+   *  Length - 16 bits unsigned integer: The value for this field is the
+      length of the message.
+
+   *  Result - 32 bits of a string with padding: The value for this
+      field is a string of the result, meaning either a number or a
+      phrase for error (with padding to fill up to 32 bits).
+
+   The server will send back to the client a packet with the type of the
+   message (1 [response]), the length of the total message and a string
+   with the result of the operation requested by the client (number if
+   successful, otherwise error message), which will be filled with the
+   necessary padding.  The type and length are unsigned short integers
+   (H), so they are given 2 bytes each and constitute the first level of
+   the packet.  Finally, for the result string, it is given the last
+   level of 4 bytes, since it is a string with variable length and
+   whatever is left over is filled with the corresponding calculated
+   padding.
+
+5.  Acknowledgements
+
+   The author would like to acknowledge all the hard work that has been
+   put into this protocol's implementation.
+
+   The author would also like to thank the IETF and all the academic
+   personnel of Uni.Pi., for their time and patience.
+
+
+
+
+
+
+
+Dimitrakoulakos         Expires 26 November 2023                [Page 6]
+
+Internet-Draft          Semester project for 2023               May 2023
+
+
+6.  IANA Considerations
+
+   This memo makes no requests to IANA.
+
+   I could request to bind Internet Numbers, but I do not.
+
+7.  Security Considerations
+
+   There is no security in this specification.  This is a prototype and
+   all messages should be sent in cleartext over the wire.
+
+   This is a VERY unsecure protocol.  Please do not implement.
+
+8.  Informative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+Author's Address
+
+   Sotirios Dimitrakoulakos
+   University of Piraeus
+   Department of Digital Systems
+   18534 Piraeus
+   Greece
+   Email: sdimitrakoulakos@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Dimitrakoulakos         Expires 26 November 2023                [Page 7]
